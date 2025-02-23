@@ -8,7 +8,7 @@
 - [Свапы](https://app.uniswap.org/swap) ETH на WETH и обратно  
 - Деплой контрактов на [Owlto](https://owlto.finance/deploy/?chain=Unichain)  
 - Минт рандомных [nft](https://nfts2.me/unichain/free/all-time)  
-- Проверка баланса на кошельках ETH и вывод кол-ва балансов
+- Проверка баланса на кошельках ETH и вывод кол-ва транзакций
 
 ## Параметры:  
 - Случайные задержки между действиями
