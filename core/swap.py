@@ -13,27 +13,30 @@ def wrap_unwrap(acc):
     try:
         client = Uniswap(acc, Chains.Unichain)
 
-        amount = round(random.uniform(*WrapUnwrapSettings.amounts), random.randint(*GeneralSettings.precision))
+        for i in range(random.randint(*WrapUnwrapSettings.count_swap)):
+            amount = round(random.uniform(*WrapUnwrapSettings.amounts), random.randint(*GeneralSettings.precision))
 
-        balance_eth = float(client.balance()) - 0.0005
-        balance_eth = balance_eth if balance_eth > 0 else 0
+            balance_eth = float(client.balance()) - 0.0005
+            balance_eth = balance_eth if balance_eth > 0 else 0
 
-        if balance_eth == 0:
-            logger.warring(f"{client.acc_name} 0 ETH на балансе")
-            return
+            if balance_eth == 0:
+                logger.warring(f"{client.acc_name} 0 ETH на балансе")
+                return
 
-        balance_weth = round(float(client.balance_weth()) * 0.99, 6)
+            balance_weth = round(float(client.balance_weth()) * 0.99, 6)
 
-        if amount > balance_eth and balance_weth != 0:
-            client.unwrap(balance_weth)
-        else:
-            action = random.choice(["wrap", "unwrap"])
-            if action == "wrap" or balance_weth == 0:
-                amount = amount if amount < balance_eth else balance_weth
-                client.wrap(amount)
+            if amount > balance_eth and balance_weth != 0:
+                client.unwrap(balance_weth)
             else:
-                amount = amount if amount < balance_weth else balance_weth
-                client.unwrap(amount)
+                action = random.choice(["wrap", "unwrap"])
+                if action == "wrap" or balance_weth == 0:
+                    amount = amount if amount < balance_eth else balance_weth
+                    client.wrap(amount)
+                else:
+                    amount = amount if amount < balance_weth else balance_weth
+                    client.unwrap(amount)
+
+            time.sleep(random.randint(*WrapUnwrapSettings.delay_swap))
 
     except Exception as err:
         logger.error(f"{client.acc_name} {err}")
