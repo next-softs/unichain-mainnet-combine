@@ -20,7 +20,7 @@ def wrap_unwrap(acc):
             balance_eth = balance_eth if balance_eth > 0 else 0
 
             if balance_eth == 0:
-                logger.warring(f"{client.acc_name} 0 ETH на балансе")
+                logger.warning(f"{client.acc_name} 0 ETH на балансе")
                 return
 
             balance_weth = round(float(client.balance_weth()) * 0.99, 6)
