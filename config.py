@@ -32,15 +32,15 @@ class BridgeSettings:
 
 class WrapUnwrapSettings:
     # объём для wrap/uwrap ETH [от, до]
-    amounts = [0.0001, 0.001]
+    amounts = [0.0002, 0.001]
+
+    # кол-во свапов за сессию
+    count_swap = [1, 4]
 
     # зедержка между свапами
     delay_swap = [5, 30]
 
-    # задержки между сессиями сессиями wrap/unwrap
-    delay = [3600*12, 3600*24]
-
-    # задержки между wrap/unwrap
+    # задержки между сессиями wrap/unwrap
     delay = [600, 3600]
 
 
