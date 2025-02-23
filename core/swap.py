@@ -16,7 +16,7 @@ def wrap_unwrap(acc):
         for i in range(random.randint(*WrapUnwrapSettings.count_swap)):
             amount = round(random.uniform(*WrapUnwrapSettings.amounts), random.randint(*GeneralSettings.precision))
 
-            balance_eth = float(client.balance()) - 0.0005
+            balance_eth = float(client.balance()) - 0.0002
             balance_eth = balance_eth if balance_eth > 0 else 0
 
             if balance_eth == 0:
