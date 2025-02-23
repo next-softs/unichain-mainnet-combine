@@ -1,4 +1,3 @@
-
 class GeneralSettings:
     # использовать прокси | True - вкл / False - откл
     useProxies = True
@@ -62,5 +61,4 @@ class NftSettings:
 
 class DeploySettings:
     # задержки между деплоем контракта на кошельках
-    delay = [3600, 3600*3]
-
+    delay = [600, 3600]
