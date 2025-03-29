@@ -1,13 +1,14 @@
-# === UNICHAIN MAINNET COMBINE 1.0 ===
+# === UNICHAIN MAINNET COMBINE 1.1 ===
 
 **UNICHAIN MAINNET COMBINE** — это бот для автоматизации взаимодействия с блокчейном unichain.  
 
 ## Функционал бота:  
 - Запуск сразу нескольких модулей
 - [Бридж](https://superbridge.app/) ETH из OP/Base в Unichain
-- [Свапы](https://app.uniswap.org/swap) ETH на WETH и обратно  
+- [Врап](https://app.uniswap.org/swap) ETH
+- [Свап](https://app.uniswap.org/swap) ETH на USDC и обратно  
 - Деплой контрактов на [Owlto](https://owlto.finance/deploy/?chain=Unichain)  
-- Минт рандомных [nft](https://nfts2.me/unichain/free/all-time)  
+- Минт рандомных nft [nfts2,](https://nfts2.me/unichain/free/all-time) [morkie](https://morkie.xyz/)
 - Проверка баланса на кошельках ETH и вывод кол-ва транзакций
 
 ## Параметры:  
