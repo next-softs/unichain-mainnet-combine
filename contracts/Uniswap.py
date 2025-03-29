@@ -91,10 +91,10 @@ class Uniswap(Default):
 
             # token_for_token
             if in_token.coin not in ["ETH", "WETH"]:
-                allowed = self.get_allowance(in_token.address, "0xEf740bf23aCaE26f6492B10de645D6B98dC8Eaf3")
+                allowed = self.get_allowance(in_token.address, "0x000000000022D473030F116dDEE9F6B43aC78BA3")
 
                 if allowed < in_amount:
-                    self.approve(spender="0xEf740bf23aCaE26f6492B10de645D6B98dC8Eaf3", token_address=in_token.address)
+                    self.approve(spender="0x000000000022D473030F116dDEE9F6B43aC78BA3", token_address=in_token.address)
                     time.sleep(3)
 
                 quote_data = self.get_quote(in_token.address, out_token.address, amount_wei)
