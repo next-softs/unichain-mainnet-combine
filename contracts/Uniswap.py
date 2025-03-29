@@ -1,4 +1,4 @@
-from tenacity import retry, stop_after_attempt, wait_fixed
+from tenacity import retry, stop_after_attempt, wait_fixed, RetryError
 from eth_account.messages import encode_typed_data
 
 from contracts.default import Default
@@ -15,7 +15,7 @@ class Uniswap(Default):
         super().__init__(account.private_key, chain.rpc, [], "", account.proxy)
         self.api_key = ""
 
-    @retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
+    @retry(stop=stop_after_attempt(1), wait=wait_fixed(3))
     def call_api(self, url, params):
         params["gasStrategies"] = [{"limitInflationFactor": 1.15,"displayLimitInflationFactor": 1.15,"priceInflationFactor": 1.5,"percentileThresholdFor1559Fee": 75,"minPriorityFeeGwei": 2,"maxPriorityFeeGwei": 9}]
 
@@ -124,6 +124,12 @@ class Uniswap(Default):
             else: decimals = self.decimals(out_token.address)
 
             return self.send_transaction(tx, f"swap {in_amount} {in_token.coin} > {self.wei_to_gwei(quote['output']['amount'], decimals)} {out_token.coin} (Uniswap)")
+
+        except RetryError as err:
+            last_attempt = err.last_attempt
+            if last_attempt.failed:
+                logger.error(f"{self.acc_name} swap {last_attempt.exception()}")
+
         except Exception as err:
             logger.error(f"{self.acc_name} swap {err}")
 
