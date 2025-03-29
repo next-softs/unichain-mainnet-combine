@@ -5,7 +5,7 @@
 ## Функционал бота:  
 - Запуск сразу нескольких модулей
 - [Бридж](https://superbridge.app/) ETH из OP/Base в Unichain
-- [Врап](https://app.uniswap.org/swap) ETH
+- [Wrap/Unwrap](https://app.uniswap.org/swap) ETH 
 - [Свап](https://app.uniswap.org/swap) ETH на USDC и обратно  
 - Деплой контрактов на [Owlto](https://owlto.finance/deploy/?chain=Unichain)  
 - Минт рандомных nft [nfts2,](https://nfts2.me/unichain/free/all-time) [morkie](https://morkie.xyz/)
