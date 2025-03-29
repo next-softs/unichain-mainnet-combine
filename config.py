@@ -1,37 +1,43 @@
+
 class GeneralSettings:
     # использовать прокси | True - вкл / False - откл
     useProxies = True
 
     # кол-во потоков
-    threads = 3
+    threads = 1
 
     # макс. кол-во символов в дробной части объёмов precision = [4, 6]
-    precision = [3, 4]
+    precision = [4, 6]
 
     # задержки между стартом аккаунтов
     delay_start = [600, 3600]
 
-    # запуск сразу нескольких модулей ["bridge", "wrap_unwrap", "mint_nft", "deploy"]
-    start_modules = ["mint_nft", "wrap_unwrap"]
+    # запуск сразу нескольких модулей ["bridge", "swap", "mint_nft", "deploy"]
+    start_modules = ["swap", "deploy"]
 
 
 class BridgeSettings:
     # объём для бриджа в unichain [от, до] рекомендуемый минимум 0.0002
-    amounts = [0.001, 0.0015]
+    amounts = [0.003, 0.0035]
 
     # из каких сетей бриджим, выбирается рандомная сеть из списка ["base", "op"], если ETH нет в выбранной сети, то берем другую сеть
     chains = ["base", "op"]
 
     # если объём ETH + WETH > заданного, то не бриджем
-    min_amount = 0.0005
+    min_amount = 0.003
 
     # задержки между бриджем на кошельках
-    delay = [10, 100]
+    delay = [60, 600]
 
+class SwapSettings:
+    # на какие монеты свапаем ["WETH", "USDC"]
+    coins = ["WETH", "USDC"]
 
-class WrapUnwrapSettings:
     # объём для wrap/uwrap ETH [от, до]
     amounts = [0.0002, 0.001]
+
+    # минимальный объём ETH при котором всегда продаем
+    min_amount_for_sell = 0.0003
 
     # кол-во свапов за сессию
     count_swap = [1, 4]
@@ -44,21 +50,25 @@ class WrapUnwrapSettings:
 
 
 class NftSettings:
+    # где покупаем NFT ["morkie", "nfts2"]
+    market_nft = ["morkie"]
+
     # макс. стоимость nft
     max_price = 0.00005
 
     # общее кол-во nft на кошельке [от, до]
-    amounts = [4, 6]
+    amounts = [7, 9]
 
     # задержки между минтом
-    delay = [10, 100]
+    delay = [5, 15]
 
     # всегда минтить разные nft | True - вкл / False - откл
     mint_different = True
 
     # минтим nft если их заминтили > указанного
-    min_nfts_minted = 30
+    min_nfts_minted = 110
 
 class DeploySettings:
     # задержки между деплоем контракта на кошельках
     delay = [600, 3600]
+

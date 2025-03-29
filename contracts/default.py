@@ -5,6 +5,9 @@ from config import *
 from utils.logs import logger
 from utils.get_abi import get_abi
 from utils.session import create_session
+from utils.encode import get_data_byte64
+
+import random, time
 
 
 class Default:
@@ -16,6 +19,7 @@ class Default:
         self.private_key = private_key
         self.address = self.w3.eth.account.from_key(self.private_key).address
         self.acc_name = f"{self.address[:5]}..{self.address[-5:]}"
+        self.chain_id = self.w3.eth.chain_id
 
         if contract_address:
             self.contract_address = contract_address
@@ -25,13 +29,18 @@ class Default:
         self.gwei = 18
         self.erc20_abi = [{'constant': True, 'inputs': [{'name': '_owner', 'type': 'address'}], 'name': 'balanceOf', 'outputs': [{'name': 'balance', 'type': 'uint256'}], 'type': 'function'}, {'constant': True, 'inputs': [], 'name': 'decimals', 'outputs': [{'name': '', 'type': 'uint8'}], 'type': 'function'}, {'constant': True, 'inputs': [{'name': '_owner', 'type': 'address'}, {'name': '_spender', 'type': 'address'}], 'name': 'allowance', 'outputs': [{'name': 'remaining', 'type': 'uint256'}], 'type': 'function'}]
 
+    def sleep(self, delay):
+        timeout = random.randint(*delay)
+        logger.info(f"{self.acc_name} ожидаем {timeout} сек.")
+        time.sleep(timeout)
+
     def gwei_to_wei(self, value_in_gwei, gwei=0):
         gwei = gwei if gwei != 0 else self.gwei
-        return int(Decimal(value_in_gwei) * Decimal(10**gwei))
+        return int(Decimal(str(value_in_gwei)) * Decimal(10**gwei))
 
     def wei_to_gwei(self, value_in_wei, gwei=0):
         gwei = gwei if gwei != 0 else self.gwei
-        return round(Decimal(value_in_wei) / Decimal(10**gwei), gwei)
+        return round(Decimal(str(value_in_wei)) / Decimal(10**gwei), gwei)
 
     def send_transaction(self, tx, desc=""):
         try:
@@ -56,37 +65,22 @@ class Default:
     def nonce(self):
         return hex(self.w3.eth.get_transaction_count(self.address))
 
-    def approve(self, contract, spender, amount=0, address_to=None, func_approve=None):
-        if func_approve:
-            data = get_data_byte64(func_approve, spender,
-                                   hex(amount if amount != 0 else self.infinite))
-        else:
-            contract_instance = self.w3.eth.contract(address=contract.address, abi=contract.abi)
-            data = contract_instance.encode_abi(
-                "approve",
-                args=(
-                    spender,
-                    amount if amount != 0 else self.infinite
-                ))
+    def approve(self, spender, token_address, amount=0):
+        data = get_data_byte64("0x095ea7b3",
+                               spender,
+                               hex(self.gwei_to_wei(amount)) if amount != 0 else "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
 
         tx = {
             "chainId": self.w3.eth.chain_id,
             "data": data,
             "from": self.address,
-            "nonce": self.nonce(),
-            "value": "0x0"
+            "nonce": self.nonce()
         }
 
-        if address_to: tx.update({"to": address_to})
+        if token_address: tx.update({"to": token_address})
 
-        try:
-            status = self.send_transaction(tx, "approve")
-            return status
-
-        except Exception as e:
-            logger.error(f"{self.acc_name} {e}")
-
-        return False
+        status = self.send_transaction(tx, "approve")
+        return status
 
     def get_allowance(self, token_address, spender=None):
         contract_address = self.w3.to_checksum_address(
@@ -108,6 +102,6 @@ class Default:
 
     def token_balance(self, token_address):
         contract_instance = self.w3.eth.contract(address=token_address, abi=self.erc20_abi)
-        return self.wei_to_gwei(contract_instance.functions.balanceOf(self.address).call())
+        return self.wei_to_gwei(contract_instance.functions.balanceOf(self.address).call(), self.decimals(token_address))
 
 

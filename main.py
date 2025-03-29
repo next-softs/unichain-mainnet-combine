@@ -4,13 +4,13 @@ import threading
 from models.accounts import Accounts
 from models.chains import Chains
 
-from utils.first_message import first_message
+from utils.first_message import first_message, get_action
 from utils.logs import logger
 from config import *
 
 from core.bridge import start_bridge, address_no_balance
 from core.info_wallets import start_info
-from core.swap import start_wrap_unwrap
+from core.swap import start_swap, swap
 from core.deploy import start_deploy
 from core.nft import start_mint_nft
 
@@ -21,17 +21,10 @@ def main():
     accounts = accounts_manager.accounts
     random.shuffle(accounts)
 
-    action = input("> 1. Запуск нескольких модулей\n"
-                   "> 2. Баланс ETH и кол-во транзакций\n"
-                   "> 3. Бридж\n"
-                   "> 4. Warp Unwrap ETH\n"
-                   "> 5. Минт рандомных NFT\n"
-                   "> 6. Деплой контракта Owlto\n"
-                   ">> ")
-    print("-"*50+"\n")
+    action = get_action(["Запуск нескольких модулей", "Баланс ETH и кол-во транзакций", "Деплой контракта Owlto", "Минт NFT", "Бридж", "Свапы"])
 
-    if action == "1":
-        modules_start = {"bridge": start_bridge, "wrap_unwrap": start_wrap_unwrap, "mint_nft": start_mint_nft, "deploy": start_deploy}
+    if action == "Запуск нескольких модулей":
+        modules_start = {"bridge": start_bridge, "swap": start_swap, "mint_nft": start_mint_nft, "deploy": start_deploy}
 
         ths = []
         for m in GeneralSettings.start_modules:
@@ -43,23 +36,23 @@ def main():
 
         for th in ths: th.join()
 
-    elif action == "2":
+    elif action == "Баланс ETH и кол-во транзакций":
         start_info(accounts)
 
-    elif action == "3":
+    elif action == "Бридж":
         start_bridge(accounts)
 
         print(f"\nНа этих кошельках не было ETH для бриджа:")
         for addr in address_no_balance:
             print(addr)
 
-    elif action == "4":
-        start_wrap_unwrap(accounts)
+    elif action == "Свапы":
+        start_swap(accounts)
 
-    elif action == "5":
+    elif action == "Минт NFT":
         start_mint_nft(accounts)
 
-    elif action == "6":
+    elif action == "Деплой контракта Owlto":
         start_deploy(accounts)
 
     else:
@@ -68,5 +61,4 @@ def main():
 if __name__ == '__main__':
     first_message()
     main()
-
 

@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from utils.logs import logger
 from models.chains import Chains
 from contracts.Bridge import *
-from contracts.Swap import *
+from contracts.Uniswap import *
 from config import *
 
 import random, time

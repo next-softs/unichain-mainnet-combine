@@ -9,6 +9,8 @@ from models.chains import Chains
 from utils.session import headers
 from config import NftSettings
 
+from bs4 import BeautifulSoup as bs
+
 
 class MintNft(Default):
     def __init__(self, account):
@@ -42,6 +44,62 @@ class MintNft(Default):
             "nonce": self.nonce(),
             "to": self.contract_address,
             "value": hex(int(nft["value"]*1.1))
+        }
+
+        return self.send_transaction(tx, f"mint {nft['title']}")
+
+    def get_balance_nft(self, address):
+        return self.gwei_to_wei(self.token_balance(address))
+
+class MorkieNFT(Default):
+    def __init__(self, account):
+        super().__init__(account.private_key, Chains.Unichain.rpc, [], "", account.proxy)
+        self.acc = account
+
+    @staticmethod
+    def get_nfts():
+        resp = requests.get("https://morkie.xyz/")
+        soup = bs(resp.text, "html.parser")
+
+        nft_urls = []
+        items = soup.find_all("article")
+        for item in items:
+            a = item.find("a")
+            img = item.find_all("img")
+
+            if a and img and "uni.svg" in img[-1].get("src"):
+                nft_urls.append("https://morkie.xyz" + a.get("href"))
+
+        nfts = []
+        for nft_url in nft_urls:
+            resp = requests.get(nft_url)
+            soup = bs(resp.text, "html.parser")
+
+            nft_name = soup.find("h4").text
+
+            amount = soup.find("h2").text.split()[0]
+            if amount.lower() == "free":
+                amount = 0
+
+            nfts.append({
+                "title": nft_name,
+                "address": soup.find_all("article")[1].find("span").text,
+                "value": float(amount)
+            })
+
+        return nfts
+
+    def mint(self, nft):
+        data = data = get_data_byte64("0x84bb1e42", self.address, 1, "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", hex(self.gwei_to_wei(nft["value"])),
+                                      hex(192), 160, 80, "", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "", "", "")
+
+        tx = {
+            "chainId": self.chain_id,
+            "data": data,
+            "from": self.address,
+            "nonce": self.nonce(),
+            "to": nft["address"],
+            "value": hex(self.gwei_to_wei(nft["value"]))
         }
 
         return self.send_transaction(tx, f"mint {nft['title']}")

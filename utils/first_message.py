@@ -1,10 +1,33 @@
-from art import text2art
+import inquirer
+
 from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+from art import text2art
+
 
 def first_message():
     console = Console()
-    console.print(text2art("NEXT SOFTS\nUNICHAIN\nMAINNET", font="tarty1"), style="rgb(235,160,63)")
-    print()
-    console.print("Телеграм с обновлениями и другими софтами:", style="rgb(86,171,227)", end=" ")
-    console.print("https://t.me/next_softs\n", style="rgb(86,171,227)")
-    print("-"*50+"\n")
+    color = "#3985bf"
+
+    console.print(Panel.fit(text2art("UNICHAIN\n  COMBINE", font="small"), title="", border_style=color), style=color, end="")
+
+    text_link = Text("@next_softs", style=color)
+    text_link.stylize("link https://t.me/next_softs")
+    console.print("Обновления и другие софты: ", style=color, end="")
+    console.print(text_link, style=color, end="\n\n")
+
+def get_action(actions):
+    actions.append("Выход")
+    questions = [
+        inquirer.List(
+            "action",
+            message='Выберите ваше действие',
+            choices=actions
+        )
+    ]
+
+    action = inquirer.prompt(questions)["action"]
+    if action == "Выход": exit(0)
+
+    return action

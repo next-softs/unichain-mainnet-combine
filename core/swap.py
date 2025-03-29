@@ -4,44 +4,13 @@ from concurrent.futures import ThreadPoolExecutor
 import time
 
 from config import *
-from contracts.Swap import *
+from contracts.Uniswap import *
 from utils.logs import logger
 from models.chains import Chains
+from models.coins import Coins
 
 
-def wrap_unwrap(acc):
-    try:
-        client = Uniswap(acc, Chains.Unichain)
-
-        for i in range(random.randint(*WrapUnwrapSettings.count_swap)):
-            amount = round(random.uniform(*WrapUnwrapSettings.amounts), random.randint(*GeneralSettings.precision))
-
-            balance_eth = float(client.balance()) - 0.0002
-            balance_eth = balance_eth if balance_eth > 0 else 0
-
-            if balance_eth == 0:
-                logger.warning(f"{client.acc_name} 0 ETH на балансе")
-                return
-
-            balance_weth = round(float(client.balance_weth()) * 0.99, 6)
-
-            if amount > balance_eth and balance_weth != 0:
-                client.unwrap(balance_weth)
-            else:
-                action = random.choice(["wrap", "unwrap"])
-                if action == "wrap" or balance_weth == 0:
-                    amount = amount if amount < balance_eth else balance_weth
-                    client.wrap(amount)
-                else:
-                    amount = amount if amount < balance_weth else balance_weth
-                    client.unwrap(amount)
-
-            time.sleep(random.randint(*WrapUnwrapSettings.delay_swap))
-
-    except Exception as err:
-        logger.error(f"{client.acc_name} {err}")
-
-def start_wrap_unwrap(accounts):
+def start_swap(accounts):
     random.shuffle(accounts)
 
     accs = {}
@@ -58,12 +27,54 @@ def start_wrap_unwrap(accounts):
         for acc, timeout in accounts_timeout.copy().items():
             if time.time() >= timeout:
                 start_accounts.append(accs[acc])
-                accounts_timeout[acc] = int(time.time() + random.randint(*WrapUnwrapSettings.delay))
+                accounts_timeout[acc] = int(time.time() + random.randint(*SwapSettings.delay))
 
         if start_accounts:
             with ThreadPoolExecutor(max_workers=GeneralSettings.threads) as executor:
-                futures = [executor.submit(wrap_unwrap, acc) for acc in start_accounts]
+                futures = [executor.submit(swap, acc) for acc in start_accounts]
 
                 for future in futures:
                     future.result()
 
+def sell_all(acc):
+    client = Uniswap(acc)
+
+    swaped = False
+    for coin in SwapSettings.coins:
+        coin = Coins().coins_list()[coin]
+        balance_token = client.token_balance(coin.address)
+        if balance_token > 0:
+            client.swap(coin, Coins.ETH, balance_token)
+            swaped = True
+            time.sleep(5)
+
+    return swaped
+
+def swap(acc):
+    try:
+        client = Uniswap(acc)
+
+        for i in range(random.randint(*SwapSettings.count_swap)):
+            balance_eth = float(client.balance()) - 0.0002
+            balance_eth = balance_eth if balance_eth > 0 else 0
+
+            amount = round(random.uniform(*SwapSettings.amounts), random.randint(*GeneralSettings.precision))
+
+            if balance_eth == 0 or balance_eth - amount < SwapSettings.min_amount_for_sell:
+                logger.warning(f"{client.acc_name} слишком мало ETH на балансе, пытаемся все продать..")
+                sell_all(acc)
+                return True
+
+            side = random.choice(["buy", "sell"])
+
+            selled = False
+            if side == "sell":
+                selled = sell_all(acc)
+
+            if side == "buy" or not selled:
+                client.swap(in_token=Coins.ETH, out_token=Coins().coins_list()[random.choice(SwapSettings.coins)], in_amount=amount)
+
+            client.sleep(SwapSettings.delay_swap)
+
+    except Exception as err:
+        logger.error(err)

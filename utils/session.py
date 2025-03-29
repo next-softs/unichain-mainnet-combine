@@ -17,6 +17,5 @@ def create_session(proxy):
         session.proxies = proxies
 
     session.headers = headers()
-
     return session
 
