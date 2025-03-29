@@ -125,7 +125,7 @@ class Uniswap(Default):
 
             return self.send_transaction(tx, f"swap {in_amount} {in_token.coin} > {self.wei_to_gwei(quote['output']['amount'], decimals)} {out_token.coin} (Uniswap)")
         except Exception as err:
-            logger.error(f"{self.acc_name} swap unswap {err}")
+            logger.error(f"{self.acc_name} swap {err}")
 
         return False
 
