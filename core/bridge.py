@@ -11,12 +11,14 @@ import random, time
 address_no_balance = []
 
 def bridge(acc):
+    bridges = {"gas.zip": GasZip, "superbridge": SuperBridge}
+
     amount = round(random.uniform(*BridgeSettings.amounts), random.randint(*GeneralSettings.precision))
 
     client = Uniswap(acc, Chains.Unichain)
-    if BridgeSettings.min_amount < float(client.balance()) + float(client.balance_weth()):
-        logger.warning(f"{client.acc_name} на балансе больше {BridgeSettings.min_amount} ETH бриджить не будем")
-        return True
+    # if BridgeSettings.min_amount < float(client.balance()) + float(client.balance_weth()):
+    #     logger.warning(f"{client.acc_name} на балансе больше {BridgeSettings.min_amount} ETH бриджить не будем")
+    #     return True
 
     chains = {"base": Chains.Base, "op": Chains.OP}
     chains_list = BridgeSettings.chains
@@ -24,7 +26,7 @@ def bridge(acc):
 
     client = None
     for chain in chains_list:
-        client = SuperBridge(acc, chains[chain])
+        client = bridges[random.choice(BridgeSettings.bridges)](acc, chains[chain])
         if client.balance() >= amount: break
     else:
         logger.warning(f"{client.acc_name} в указанных сетях нет нужного кол-ва ETH {amount}")

@@ -10,5 +10,18 @@ def get_data_byte64(func, *args):
 
     return data
 
+def data_decoder(data):
+    try:
+        data = data[10:]
+        string_length = int(data[64:128], 16)
+        error_message = bytes.fromhex(data[128:128 + string_length * 2]).decode("utf-8")
+
+        return error_message
+
+    except:
+        pass
+
+    return data
+
 
 

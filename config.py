@@ -20,6 +20,9 @@ class BridgeSettings:
     # объём для бриджа в unichain [от, до] рекомендуемый минимум 0.0002
     amounts = [0.003, 0.0035]
 
+    # мосты ["gas.zip", "superbridge"]
+    bridges = ["gas.zip", "superbridge"]
+
     # из каких сетей бриджим, выбирается рандомная сеть из списка ["base", "op"], если ETH нет в выбранной сети, то берем другую сеть
     chains = ["base", "op"]
 
