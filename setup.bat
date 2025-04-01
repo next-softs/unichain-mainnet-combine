@@ -6,4 +6,5 @@ pip install fake-useragent
 pip install requests
 pip install inquirer
 pip install tenacity
+pip install bs4
 pause
