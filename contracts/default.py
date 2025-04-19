@@ -97,14 +97,25 @@ class Default:
         return contract_instance.functions.allowance(self.address, spender).call()
 
     def decimals(self, token_address):
-        contract_instance = self.w3.eth.contract(address=token_address, abi=self.erc20_abi)
-        return contract_instance.functions.decimals().call()
+        try:
+            contract_instance = self.w3.eth.contract(address=token_address, abi=self.erc20_abi)
+            return contract_instance.functions.decimals().call()
+        except:
+            pass
+
+        return self.gwei
 
     def balance(self):
         return self.wei_to_gwei(self.w3.eth.get_balance(self.address))
 
     def token_balance(self, token_address):
         contract_instance = self.w3.eth.contract(address=token_address, abi=self.erc20_abi)
-        return self.wei_to_gwei(contract_instance.functions.balanceOf(self.address).call(), self.decimals(token_address))
+        balance = contract_instance.functions.balanceOf(self.address).call()
+        decimals = self.decimals(token_address)
+
+        if decimals:
+            balance = self.wei_to_gwei(balance, self.decimals(token_address))
+
+        return balance
 
 

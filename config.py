@@ -10,7 +10,7 @@ class GeneralSettings:
     precision = [4, 6]
 
     # задержки между стартом аккаунтов
-    delay_start = [600, 3600]
+    delay_start = [600, 3600*2]
 
     # запуск сразу нескольких модулей ["bridge", "swap", "mint_nft", "deploy"]
     start_modules = ["swap", "deploy"]
@@ -49,7 +49,7 @@ class SwapSettings:
     delay_swap = [5, 30]
 
     # задержки между сессиями wrap/unwrap
-    delay = [600, 3600]
+    delay = [3600 * 3, 3600 * 12]
 
 
 class NftSettings:
@@ -73,5 +73,5 @@ class NftSettings:
 
 class DeploySettings:
     # задержки между деплоем контракта на кошельках
-    delay = [600, 3600]
+    delay = [3600*12, 3600*24]
 

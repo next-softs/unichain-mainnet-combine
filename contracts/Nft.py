@@ -19,7 +19,7 @@ class MintNft(Default):
 
     @staticmethod
     def get_nfts():
-        resp = requests.get("https://nfts2.me/_next/data/b6zX-RsS2TNLvohfE1Tgz/unichain/free/all-time.json?params=unichain&params=free&params=all-time", headers=headers(), timeout=10).json()
+        resp = requests.get("https://nfts2.me/_next/data/j-wXu0oNuJY0yCm09TF-J/unichain/top-minted/all-time.json?params=unichain&params=top-minted&params=all-time", headers=headers(), timeout=10).json()
 
         nfts = []
         for r in resp["pageProps"]["data"]:
