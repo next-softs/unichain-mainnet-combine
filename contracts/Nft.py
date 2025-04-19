@@ -1,4 +1,4 @@
-import requests, web3
+import requests, web3, json
 
 from contracts.default import Default
 from utils.encode import get_data_byte64
@@ -19,11 +19,13 @@ class MintNft(Default):
 
     @staticmethod
     def get_nfts():
-        resp = requests.get("https://nfts2.me/_next/data/j-wXu0oNuJY0yCm09TF-J/unichain/top-minted/all-time.json?params=unichain&params=top-minted&params=all-time", headers=headers(), timeout=10).json()
-
+        resp = requests.get("https://nfts2.me/unichain/top-minted/all-time", headers=headers(), timeout=10).text
+        soup = bs(resp, "html.parser")
+        data = json.loads(soup.find("script", id="__NEXT_DATA__").text)
+        
         nfts = []
-        for r in resp["pageProps"]["data"]:
-            if r["chainName"] == "unichain" and not r["soldout"] and int(r["mintFee"]) <= NftSettings.max_price*(10**18) and NftSettings.min_nfts_minted < int(r["nftsMinted"]):
+        for r in data["props"]["pageProps"]["data"]:
+            if r["chainName"] == "unichain" and not r["soldout"] and int(r["mintFee"]) <= NftSettings.max_price * (10 ** 18) and NftSettings.min_nfts_minted < int(r["nftsMinted"]):
                 nfts.append({
                     "title": r["name"].split(";")[0],
                     "address": web3.Web3().to_checksum_address(r["id"]),
